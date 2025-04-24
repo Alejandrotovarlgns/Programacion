@@ -1,20 +1,29 @@
 package hito;
-	public class Perro extends Animal {
-		// Atributo específico de Perro: tamaño, que indica el tamaño del perro (grande, mediano, pequeño)
-		   String tamaño;
-		   // Constructor: crea un Perro asignando los datos comunes de Animal + el tamaño del perro
-		   public Perro(String chip, String nombre, int edad, String raza, boolean adoptado, String tamaño) {
-		       super(chip, nombre, edad, raza, adoptado);
-		       this.tamaño = tamaño;
-		   }
-		   // Método mostrar: muestra toda la información del perro, incluido su tamaño
-		   public void mostrar() {
-		       System.out.println("PERRO:");
-		       System.out.println("Chip: " + chip);
-		       System.out.println("Nombre: " + nombre);
-		       System.out.println("Edad: " + edad);
-		       System.out.println("Raza: " + raza);
-		       System.out.println("Adoptado: " + adoptado);
-		       System.out.println("Tamaño: " + tamaño);
-		   }
-		}
+
+// Clase Perro que hereda de la clase Animal
+public class Perro extends Animal {
+    private String raza; // Atributo específico para perros: raza
+
+    // Constructor de Perro que recibe chip, nombre, edad y raza
+    public Perro(String chip, String nombre, int edad, String raza) {
+        super(chip, nombre, edad); // Llama al constructor de la clase padre (Animal)
+        this.raza = raza;
+    }
+
+    // Getter para obtener la raza del perro
+    public String getRaza() {
+        return raza;
+    }
+
+    // Método que devuelve el tipo del animal, en este caso "Perro"
+    @Override
+    public String getTipo() {
+        return "Perro";
+    }
+
+    // Método para representar el perro como cadena de texto, incluyendo la raza
+    @Override
+    public String toString() {
+        return super.toString() + " | Raza: " + raza;
+    }
+}

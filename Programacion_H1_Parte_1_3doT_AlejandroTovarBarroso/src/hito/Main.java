@@ -1,136 +1,139 @@
 package hito;
-import java.util.ArrayList;
-import java.util.Scanner;
+
+import java.util.*;
 
 public class Main {
-
-    // Lista global donde guardamos todos los animales registrados
-    public static ArrayList<Animal> listaAnimales = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+    static HashMap<String, Animal> animales = new HashMap<>();
+    static ArrayList<Adopcion> adopciones = new ArrayList<>();
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        boolean salir = false;
+        int opcion;
 
-        // El menú se repite hasta que el usuario decida salir
-        while (!salir) {
-            System.out.println("---Menú principal---");
-            System.out.println("1. Añadir un perro");
-            System.out.println("2. Añadir un gato");
-            System.out.println("3. Buscar animal por chip");
-            System.out.println("4. Ver todos los animales");
-            System.out.println("5. Salir del sistema");
-            System.out.print("Elige una opción: ");
-            int opcion = Integer.parseInt(scanner.nextLine());
-
-            switch (opcion) {
-                case 1 -> registrarPerro(scanner); // Añade un nuevo perro
-                case 2 -> registrarGato(scanner);  // Añade un nuevo gato
-                case 3 -> buscarPorChip(scanner);  // Busca animal por chip
-                case 4 -> mostrarTodos();          // Muestra la lista completa
-                case 5 -> {
-                    salir = true;
-                    System.out.println("Gracias por usar el sistema.");
+        // Bucle principal que muestra el menú y ejecuta la opción elegida por el usuario
+        do {
+            mostrarMenu();
+            try {
+                opcion = Integer.parseInt(sc.nextLine());
+                switch (opcion) {
+                    case 1 -> darAlta(); // Opción para dar de alta un nuevo animal
+                    case 2 -> listarAnimales(); // Opción para listar todos los animales
+                    case 3 -> buscarAnimal(); // Opción para buscar un animal por chip
+                    case 4 -> realizarAdopcion(); // Opción para registrar una adopción
+                    case 5 -> darBaja(); // Opción para eliminar un animal
+                    case 6 -> estadisticasGatos(); // Opción para mostrar estadísticas de gatos
+                    case 7 -> System.out.println("Saliendo..."); // Salida del programa
+                    default -> System.out.println("Opción no válida.");
                 }
-                default -> System.out.println("Opción incorrecta. Intenta de nuevo.");
+            } catch (NumberFormatException e) {
+                System.out.println("Introduce un número válido.");
+                opcion = 0;
             }
-        }
-
-        scanner.close(); // Cerramos el escáner cuando ya no se usará
+        } while (opcion != 7);
     }
 
-    // Registra un perro con los datos introducidos por el usuario
-    public static void registrarPerro(Scanner scanner) {
-        System.out.println("Registro de perro:");
-        String chip = pedirChip(scanner);
-        String nombre = pedirTexto(scanner, "Nombre");
-        int edad = pedirEntero(scanner, "Edad");
-        String raza = pedirTexto(scanner, "Raza");
-        boolean adoptado = pedirBooleano(scanner, "¿Está adoptado? (true/false)");
-        String tamaño = pedirTexto(scanner, "Tamaño (pequeño/mediano/grande)");
-
-        Perro perro = new Perro(chip, nombre, edad, raza, adoptado, tamaño);
-        listaAnimales.add(perro);
-        System.out.println("¡Perro añadido con éxito!");
+    // Muestra el menú principal con todas las opciones disponibles
+    public static void mostrarMenu() {
+        System.out.println("\n--- MENÚ ---");
+        System.out.println("1 – Dar de alta animal");
+        System.out.println("2 – Listar animales");
+        System.out.println("3 – Buscar animal");
+        System.out.println("4 – Realizar adopción");
+        System.out.println("5 – Dar de baja");
+        System.out.println("6 – Mostrar estadísticas de gatos");
+        System.out.println("7 – Salir");
+        System.out.print("Elige una opción: ");
     }
 
-    // Registra un gato con los datos introducidos por el usuario
-    public static void registrarGato(Scanner scanner) {
-        System.out.println("Registro de gato:");
-        String chip = pedirChip(scanner);
-        String nombre = pedirTexto(scanner, "Nombre");
-        int edad = pedirEntero(scanner, "Edad");
-        String raza = pedirTexto(scanner, "Raza");
-        boolean adoptado = pedirBooleano(scanner, "¿Está adoptado? (true/false)");
-        boolean leucemia = pedirBooleano(scanner, "¿Test de leucemia positivo? (true/false)");
+    // Permite al usuario registrar un nuevo animal (perro o gato)
+    public static void darAlta() {
+        System.out.print("¿Qué tipo de animal es (perro/gato)? ");
+        String tipo = sc.nextLine().toLowerCase();
 
-        Gato gato = new Gato(chip, nombre, edad, raza, adoptado, leucemia);
-        listaAnimales.add(gato);
-        System.out.println("¡Gato añadido con éxito!");
-    }
+        System.out.print("Chip: ");
+        String chip = sc.nextLine();
+        System.out.print("Nombre: ");
+        String nombre = sc.nextLine();
+        System.out.print("Edad: ");
+        int edad = Integer.parseInt(sc.nextLine());
 
-    // Permite buscar un animal usando su número de chip
-    public static void buscarPorChip(Scanner scanner) {
-        String chip = pedirTexto(scanner, "Introduce el número de chip");
-        boolean encontrado = false;
-
-        for (Animal animal : listaAnimales) {
-            if (animal.chip.equals(chip)) {
-                animal.mostrar(); // Mostramos al animal encontrado
-                encontrado = true;
-                break;
-            }
-        }
-
-        if (!encontrado) {
-            System.out.println("No se ha encontrado ningún animal con ese chip.");
-        }
-    }
-// Muestra todos los animales registrados en la lista
-    public static void mostrarTodos() {
-        if (listaAnimales.isEmpty()) {
-            System.out.println("Aún no hay animales registrados.");
+        if (tipo.equals("perro")) {
+            System.out.print("Raza: ");
+            String raza = sc.nextLine();
+            animales.put(chip, new Perro(chip, nombre, edad, raza));
+        } else if (tipo.equals("gato")) {
+            System.out.print("¿Test de leucemia positivo? (true/false): ");
+            boolean leucemia = Boolean.parseBoolean(sc.nextLine());
+            animales.put(chip, new Gato(chip, nombre, edad, leucemia));
         } else {
-            System.out.println("=== Lista de animales ===");
-            for (Animal a : listaAnimales) {
-                a.mostrar();
-            }
+            System.out.println("Tipo no reconocido.");
         }
     }
 
-    // Solicita un texto al usuario
-    public static String pedirTexto(Scanner scanner, String mensaje) {
-        System.out.print(mensaje + ": ");
-        return scanner.nextLine();
-    }
-
-    // Solicita un número entero al usuario
-    public static int pedirEntero(Scanner scanner, String mensaje) {
-        System.out.print(mensaje + ": ");
-        return Integer.parseInt(scanner.nextLine());
-    }
-
-    // Solicita un valor booleano al usuario (true/false)
-    public static boolean pedirBooleano(Scanner scanner, String mensaje) {
-        System.out.print(mensaje + ": ");
-        return Boolean.parseBoolean(scanner.nextLine());
-    }
-
-    // Pide un número de chip único (no repetido)
-    public static String pedirChip(Scanner scanner) {
-        while (true) {
-            String chip = pedirTexto(scanner, "Número de chip");
-            boolean repetido = false;
-
-            for (Animal a : listaAnimales) {
-                if (a.chip.equals(chip)) {
-                    repetido = true;
-                    break;
-                }
-            }
-
-            if (!repetido) return chip;
-
-            System.out.println("Ese chip ya está registrado. Intenta con otro.");
+    // Muestra la lista de todos los animales registrados
+    public static void listarAnimales() {
+        if (animales.isEmpty()) {
+            System.out.println("No hay animales registrados.");
+        } else {
+            animales.values().forEach(System.out::println);
         }
+    }
+
+    // Busca y muestra los datos de un animal a partir de su número de chip
+    public static void buscarAnimal() {
+        System.out.print("Introduce el chip del animal: ");
+        String chip = sc.nextLine();
+        Animal animal = animales.get(chip);
+        if (animal != null) {
+            System.out.println(animal);
+        } else {
+            System.out.println("Animal no encontrado.");
+        }
+    }
+
+    // Registra una adopción si el animal existe y no ha sido adoptado aún
+    public static void realizarAdopcion() {
+        System.out.print("Introduce el chip del animal: ");
+        String chip = sc.nextLine();
+        Animal animal = animales.get(chip);
+
+        if (animal == null) {
+            System.out.println("Animal no encontrado.");
+        } else if (animal.isAdoptado()) {
+            System.out.println("El animal ya ha sido adoptado.");
+        } else {
+            System.out.print("Nombre de la persona: ");
+            String nombre = sc.nextLine();
+            System.out.print("DNI: ");
+            String dni = sc.nextLine();
+            animal.setAdoptado(true);
+            adopciones.add(new Adopcion(animal, nombre, dni));
+            System.out.println("Adopción realizada con éxito.");
+        }
+    }
+
+    // Elimina un animal del sistema, y si está adoptado, también elimina la adopción
+    public static void darBaja() {
+        System.out.print("Introduce el chip del animal: ");
+        String chip = sc.nextLine();
+        Animal animal = animales.remove(chip);
+
+        if (animal == null) {
+            System.out.println("Animal no encontrado.");
+        } else {
+            adopciones.removeIf(adopcion -> adopcion.getAnimal().getChip().equals(chip));
+            System.out.println("Animal eliminado correctamente.");
+        }
+    }
+
+    // Muestra estadísticas de gatos: total registrados y cuántos tienen leucemia
+    public static void estadisticasGatos() {
+        long total = animales.values().stream().filter(a -> a instanceof Gato).count();
+        long conLeucemia = animales.values().stream()
+            .filter(a -> a instanceof Gato && ((Gato) a).isTestLeucemia())
+            .count();
+
+        System.out.println("Total de gatos: " + total);
+        System.out.println("Gatos con leucemia: " + conLeucemia);
     }
 }
